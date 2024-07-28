@@ -23,5 +23,27 @@ src/common_audio/vad/vad_sp.c \
 src/common_audio/vad/webrtc_vad.c \
 src/rtc_base/checks.cc
 
+INCLUDES = \
+src/common_audio/signal_processing/complex_fft_tables.h \
+src/common_audio/signal_processing/dot_product_with_scale.h \
+src/common_audio/signal_processing/include/real_fft.h \
+src/common_audio/signal_processing/include/signal_processing_library.h \
+src/common_audio/signal_processing/include/spl_inl.h \
+src/common_audio/signal_processing/resample_by_2_internal.h \
+src/common_audio/third_party/spl_sqrt_floor/spl_sqrt_floor.h \
+src/common_audio/vad/include/webrtc_vad.h \
+src/common_audio/vad/vad_core.h \
+src/common_audio/vad/vad_filterbank.h \
+src/common_audio/vad/vad_gmm.h \
+src/common_audio/vad/vad_sp.h \
+src/rtc_base/checks.h \
+src/rtc_base/compile_assert_c.h \
+src/rtc_base/numerics/safe_compare.h \
+src/rtc_base/sanitizer.h \
+src/rtc_base/system/arch.h \
+src/rtc_base/system/inline.h \
+src/rtc_base/type_traits.h \
+src/system_wrappers/include/cpu_features_wrapper.h
+
 webrtcvadctypes.so:
 	$(CXX) $(SOURCES) -DWEBRTC_POSIX -Isrc -Iabseil-cpp -shared -fPIC -o $@
