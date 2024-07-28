@@ -2,9 +2,10 @@
 
 ```shell
 git clone https://github.com/vadimkantorov/webrtcvadctypes --recursive
+make webrtcvadctypes.so
+
 # git submodule add --branch lts_2024_07_22 git@github.com:abseil/abseil-cpp.git
 # git submodule add https://webrtc.googlesource.com/src/
-make webrtcvadctypes.so
 ```
 
 # References
