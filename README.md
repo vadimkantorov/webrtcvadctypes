@@ -1,5 +1,10 @@
 # webrtcvadctypes
 
+```shell
+git clone https://github.com/vadimkantorov/webrtcvadctypes --recursive
+make webrtcvadctypes.so
+```
+
 # References
 - https://github.com/wiseman/py-webrtcvad
 - https://github.com/wiseman/py-webrtcvad/issues/69
