@@ -1,7 +1,7 @@
 import os
 import ctypes
 
-# replicate https://github.com/wiseman/py-webrtcvad/blob/master/cbits/pywebrtcvad.c
+# TODO: replicate https://github.com/wiseman/py-webrtcvad/blob/master/cbits/pywebrtcvad.c
 # https://webrtc.googlesource.com/src/+/refs/heads/main/modules/audio_processing/vad/standalone_vad.cc
 # https://github.com/wiseman/py-webrtcvad/blob/master/example.py
 # https://github.com/vadimkantorov/readaudio/blob/master/decode_audio.py
