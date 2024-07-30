@@ -11,7 +11,7 @@ import ctypes
 
 class Vad(ctypes.c_void_p):
     @staticmethod
-    def ffi(lib_path = os.path.abspath('webrtcvadctypes.so')):
+    def ffi(lib_path = os.path.abspath('webrtcvadgmm.so')):
         lib = ctypes.CDLL(lib_path)
         
         # src/common_audio/vad/include/webrtc_vad.h

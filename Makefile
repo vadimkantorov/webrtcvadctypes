@@ -117,8 +117,8 @@ third_party/pffft/src/pffft.h \
 third_party/pffft/src/fftpack.h
 
 
-webrtcvadctypes.so:
+webrtcvadgmm.so:
 	$(CXX) $(SOURCESGMM) -DWEBRTC_POSIX -Isrc -Iabseil-cpp -shared -fPIC -o $@
 
-rnn.so:
-	$(CXX) $(SOURCESRNN) -DWEBRTC_POSIX  -DWEBRTC_LINUX -DNOMINMAX  -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
+webrtcvadrnn.so:
+	$(CXX) $(SOURCESRNN) webrtcvadrnn.so -DWEBRTC_POSIX  -DWEBRTC_LINUX -DNOMINMAX  -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
