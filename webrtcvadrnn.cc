@@ -40,23 +40,24 @@ struct VadRnnInst
 
 //extern "C"  {
 
-VadRnnInst* WebRtcVadRnn_Create()
+extern "C" VadRnnInst* WebRtcVadRnn_Create()
 {
     return new VadRnnInst();
 }
 
-void WebRtcVadRnn_Free(VadRnnInst* self)
+extern "C" void WebRtcVadRnn_Free(VadRnnInst* self)
 {
     delete self;
 }
 
-int WebRtcVadRnn_Init(VadRnnInst* self)
+extern "C" int WebRtcVadRnn_Init(VadRnnInst* self)
 {
     return 0;
 }
 
-int WebRtcVadRnn_ValidRateAndFrameLength(int rate, size_t frame_length)
+extern "C" int WebRtcVadRnn_ValidRateAndFrameLength(int rate, size_t frame_length)
 {
+  const int kRatesSize = 4, kValidRates[] = { 8000, 16000, 32000, 48000 }; 
   const int valid_length_ms = 10;
   // We only allow 10ms frames. Loop through valid frame rates and see if we have a matching pair.
   for (size_t i = 0; i < kRatesSize; i++)
@@ -71,7 +72,7 @@ int WebRtcVadRnn_ValidRateAndFrameLength(int rate, size_t frame_length)
   return -1;
 }
 
-float WebRtcVadRnn_Process(VadRnnInst* self, int fs, const int16_t* audio_frame, size_t frame_length)
+extern "C" float WebRtcVadRnn_Process(VadRnnInst* self, int fs, const int16_t* audio_frame, size_t frame_length)
 {
     //if (read_samples < frame_size_10ms) break; 
     std::vector<float>& samples_10ms = fs == 8000 ? self->samples8khz_10ms : fs == 16000 ? self->samples16khz_10ms : fs == 32000 ? self->samples32khz_10ms : self->samples48khz_10ms;
