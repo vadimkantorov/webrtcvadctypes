@@ -98,7 +98,7 @@ class Vad(ctypes.c_void_p):
             self._webrtcvad = self.ffi()
 
         self.value = self._webrtcvad.WebRtcVad_Create()
-        Vad._webrtcvad.WebRtcVad_Init(self)
+        assert 0 == Vad._webrtcvad.WebRtcVad_Init(self)
         if mode is not None:
             self.set_mode(mode)
 
@@ -109,15 +109,13 @@ class Vad(ctypes.c_void_p):
     def set_mode(self, mode):
         assert mode in [None, 0, 1, 2]
         if mode is not None:
-            Vad._webrtcvad.WebRtcVad_set_mode(self, mode)
+            assert 0 == Vad._webrtcvad.WebRtcVad_set_mode(self, mode)
 
     def is_speech(self, buf, sample_rate, length=None):
         assert sample_rate in [8000, 16000, 32000, 48000]
         length = length or int(len(buf) / 2)
         if length * 2 > len(buf):
-            raise IndexError(
-                'buffer has %s frames, but length argument was %s' % (
-                    int(len(buf) / 2.0), length))
+            raise IndexError('buffer has {} frames, but length argument was {}'.format(int(len(buf) / 2.0), length))
         return Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
 
 class VadRnn(ctypes.c_void_p):
@@ -150,7 +148,7 @@ class VadRnn(ctypes.c_void_p):
             self._webrtcvad = self.ffi()
 
         self.value = self._webrtcvad.WebRtcVadRnn_Create()
-        VadRnn._webrtcvad.WebRtcVadRnn_Init(self)
+        assert 0 == VadRnn._webrtcvad.WebRtcVadRnn_Init(self)
         if mode is not None:
             self.set_mode(mode)
 
@@ -161,15 +159,13 @@ class VadRnn(ctypes.c_void_p):
     def set_mode(self, mode):
         assert mode in [None, 0, 1, 2]
         if mode is not None:
-            VadRnn._webrtcvad.WebRtcVadRnn_set_mode(self, mode)
+            assert 0 == VadRnn._webrtcvad.WebRtcVadRnn_set_mode(self, mode)
 
     def is_speech(self, buf, sample_rate, length=None):
         assert sample_rate in [8000, 16000, 32000, 48000]
         length = length or int(len(buf) / 2)
         if length * 2 > len(buf):
-            raise IndexError(
-                'buffer has %s frames, but length argument was %s' % (
-                    int(len(buf) / 2.0), length))
+            raise IndexError('buffer has {} frames, but length argument was {}'.format(int(len(buf) / 2.0), length))
         return VadRnn._webrtcvad.WebRtcVadRnn_Process(self, sample_rate, buf, length)
 
 
