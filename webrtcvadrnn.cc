@@ -20,77 +20,50 @@
 #include "modules/audio_processing/agc2/rnn_vad/rnn.h"
 #include "rtc_base/logging.h"
 
-namespace webrtc {
-namespace rnn_vad {
+struct VadRnnInst {
+    webrtc::rnn_vad::FeaturesExtractor features_extractor;
+    webrtc::rnn_vad::RnnBasedVad rnn_vad;
+    
+    std::array<float, kFrameSize10ms24kHz> samples_10ms_24kHz;
+    std::array<float, kFeatureVectorSize> feature_vector;
+    
+    std::vector<float> samples8khz_10ms, samples16khz_10ms, samples32khz_10ms, samples48khz_10ms;
+    webrtc::rnn_vad::PushSincResampler resampler8khz, resampler16khz, resampler32khz, resampler48khz;
 
-extern void run_rnn_vad(std::string input_wav_file, std::string output_vad_probs_file, std::string output_feature_file) {
-  WavReader wav_reader(input_wav_file);
-  if (wav_reader.num_channels() != 1) {
-    RTC_LOG(LS_ERROR) << "Only mono wav files are supported";
-    return 1;
-  }
-  if (wav_reader.sample_rate() % 100 != 0) {
-    RTC_LOG(LS_ERROR) << "The sample rate rate must allow 10 ms frames.";
-    return 1;
-  }
-  RTC_LOG(LS_INFO) << "Input sample rate: " << wav_reader.sample_rate();
-
-  // Init output files.
-  FILE* vad_probs_file = fopen(output_vad_probs_file.c_str(), "wb");
-  FILE* features_file = nullptr;
-  if (!output_feature_file.empty()) {
-    features_file = fopen(output_feature_file.c_str(), "wb");
-  }
-
-  // Initialize.
-  const size_t frame_size_10ms =
-      rtc::CheckedDivExact(wav_reader.sample_rate(), 100);
-  std::vector<float> samples_10ms;
-  samples_10ms.resize(frame_size_10ms);
-  std::array<float, kFrameSize10ms24kHz> samples_10ms_24kHz;
-  PushSincResampler resampler(frame_size_10ms, kFrameSize10ms24kHz);
-  FeaturesExtractor features_extractor;
-  std::array<float, kFeatureVectorSize> feature_vector;
-  RnnBasedVad rnn_vad;
-
-  // Compute VAD probabilities.
-  while (true) {
-    // Read frame at the input sample rate.
-    const auto read_samples =
-        wav_reader.ReadSamples(frame_size_10ms, samples_10ms.data());
-    if (read_samples < frame_size_10ms) {
-      break;  // EOF.
+    VadRnnInst() : samples8khz_10ms(8000 / 100), resampler8khz(8000 / 100, kFrameSize10ms24kHz), samples16khz_10ms(16000 / 100), resampler16khz(16000 / 100, kFrameSize10ms24kHz), samples32khz_10ms(32000 / 100), resampler32khz(32000 / 100, kFrameSize10ms24kHz), samples32khz_10ms(48000 / 100), resampler48khz(48000 / 100, kFrameSize10ms24kHz), 
+    {
     }
-    // Resample input.
-    resampler.Resample(samples_10ms.data(), samples_10ms.size(),
-                       samples_10ms_24kHz.data(), samples_10ms_24kHz.size());
-
-    // Extract features and feed the RNN.
-    bool is_silence = features_extractor.CheckSilenceComputeFeatures(
-        samples_10ms_24kHz, feature_vector);
-    float vad_probability =
-        rnn_vad.ComputeVadProbability(feature_vector, is_silence);
-    // Write voice probability.
-    fwrite(&vad_probability, sizeof(float), 1, vad_probs_file);
-    // Write features.
-    if (features_file) {
-      const float float_is_silence = is_silence ? 1.f : 0.f;
-      fwrite(&float_is_silence, sizeof(float), 1, features_file);
-      if (is_silence) {
-        // Do not write uninitialized values.
-        feature_vector.fill(0.f);
-      }
-      fwrite(feature_vector.data(), sizeof(float), kFeatureVectorSize,
-             features_file);
-    }
-  }
-
-  // Close output file(s).
-  fclose(vad_probs_file);
-  if (features_file) {
-    fclose(features_file);
-  }
 }
 
-}  // namespace rnn_vad
-}  // namespace webrtc
+extern "C" {
+
+VadRnnInst* WebRtcVadRnn_Create()
+{
+    return new VadnnInst();
+}
+
+int WebRtcVadRnn_Init(VadRnnInst* self)
+{
+    return 0;
+}
+
+void WebRtcVadRnn_Free(VadRnnInst* self)
+{
+    delete self;
+}
+
+int WebRtcVadRnn_ValidRateAndFrameLength(int rate, size_t frame_length)
+{
+    return 0;
+}
+
+float WebRtcVadRnn_Process(VadRnnInst* self, int fs, const int16_t* audio_frame, size_t frame_length)
+{
+    //if (read_samples < frame_size_10ms) break; 
+    vector<float>& samples10ms = fs == 8000 ? self->samples8khz_10ms : fs == 16000 ? self->samples16khz_10ms : fs == 32000 ? self->samples32khz_10ms : self->samples48khz_10ms;
+    self->resampler.Resample(samples_10ms.data(), samples_10ms.size(), self->samples_10ms_24kHz.data(), self->samples_10ms_24kHz.size());
+    bool is_silence = self->features_extractor.CheckSilenceComputeFeatures(self->samples_10ms_24kHz, self->feature_vector);
+    return self->rnn_vad.ComputeVadProbability(self->feature_vector, is_silence);
+}
+
+}

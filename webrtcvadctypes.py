@@ -10,6 +10,8 @@ import ctypes
 # src/common_audio/vad/vad.cc
 
 class Vad(ctypes.c_void_p):
+    _webrtcvad = None
+    
     @staticmethod
     def ffi(lib_path = os.path.abspath('webrtcvadgmm.so')):
         lib = ctypes.CDLL(lib_path)
@@ -86,21 +88,31 @@ class Vad(ctypes.c_void_p):
         lib.WebRtcVad_ValidRateAndFrameLength.restype = ctypes.c_int
         return lib
 
-    _webrtcvad = ffi()
+    @staticmethod
+    def valid_rate_and_frame_length(rate, frame_length):
+        return Vad._webrtcvad.WebRtcVad_ValidRateAndFrameLength(rate, frame_length)
 
     def __init__(self, mode=None):
         # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
+        if self._webrtcvad is None:
+            self._webrtcvad = self.ffi()
+
         self.value = self._webrtcvad.WebRtcVad_Create()
         Vad._webrtcvad.WebRtcVad_Init(self)
         if mode is not None:
             self.set_mode(mode)
 
+    def __del__(self):
+        Vad._webrtcvad.WebRtcVad_Free(self)
+        self.value = None
+    
     def set_mode(self, mode):
         assert mode in [None, 0, 1, 2]
         if mode is not None:
             Vad._webrtcvad.WebRtcVad_set_mode(self, mode)
 
     def is_speech(self, buf, sample_rate, length=None):
+        assert sample_rate in [8000, 16000, 32000, 48000]
         length = length or int(len(buf) / 2)
         if length * 2 > len(buf):
             raise IndexError(
@@ -108,12 +120,57 @@ class Vad(ctypes.c_void_p):
                     int(len(buf) / 2.0), length))
         return Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
 
-    def __del__(self):
-        Vad._webrtcvad.WebRtcVad_Free(self)
-        self.value = None
+class VadRnn(ctypes.c_void_p):
+    _webrtcvad = None
+    
+    @staticmethod
+    def ffi(lib_path = os.path.abspath('webrtcvadrnn.so')):
+        lib = ctypes.CDLL(lib_path)
+        lib.WebRtcVadRnn_Create.argtypes = []
+        lib.WebRtcVadRnn_Create.restype = ctypes.c_void_p
+        lib.WebRtcVadRnn_Free.argtypes = [ctypes.c_void_p]
+        lib.WebRtcVadRnn_Free.restype = None
+        lib.WebRtcVadRnn_Init.argtypes = [ctypes.c_void_p]
+        lib.WebRtcVadRnn_Init.restype = ctypes.c_int
+        lib.WebRtcVadRnn_set_mode.argtypes = [ctypes.c_void_p, ctypes.c_int]
+        lib.WebRtcVadRnn_set_mode.restype = ctypes.c_int
+        lib.WebRtcVadRnn_Process.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int16) , ctypes.c_size_t]
+        lib.WebRtcVadRnn_Process.restype = ctypes.c_int
+        lib.WebRtcVadRnn_ValidRateAndFrameLength.argtypes = [ctypes.c_int, ctypes.c_size_t]
+        lib.WebRtcVadRnn_ValidRateAndFrameLength.restype = ctypes.c_int
+        return lib
 
-def valid_rate_and_frame_length(rate, frame_length):
-    return Vad._webrtcvad.WebRtcVad_ValidRateAndFrameLength(rate, frame_length)
+    @staticmethod
+    def valid_rate_and_frame_length(rate, frame_length):
+        return VadRnn._webrtcvad.WebRtcVadRnn_ValidRateAndFrameLength(rate, frame_length)
+
+    def __init__(self, mode=None):
+        # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
+        if self._webrtcvad is None:
+            self._webrtcvad = self.ffi()
+
+        self.value = self._webrtcvad.WebRtcVadRnn_Create()
+        VadRnn._webrtcvad.WebRtcVadRnn_Init(self)
+        if mode is not None:
+            self.set_mode(mode)
+
+    def __del__(self):
+        VadRnn._webrtcvad.WebRtcVadRnn_Free(self)
+        self.value = None
+    
+    def set_mode(self, mode):
+        assert mode in [None, 0, 1, 2]
+        if mode is not None:
+            VadRnn._webrtcvad.WebRtcVadRnn_set_mode(self, mode)
+
+    def is_speech(self, buf, sample_rate, length=None):
+        assert sample_rate in [8000, 16000, 32000, 48000]
+        length = length or int(len(buf) / 2)
+        if length * 2 > len(buf):
+            raise IndexError(
+                'buffer has %s frames, but length argument was %s' % (
+                    int(len(buf) / 2.0), length))
+        return VadRnn._webrtcvad.WebRtcVadRnn_Process(self, sample_rate, buf, length)
 
 
 if __name__ == '__main__':
