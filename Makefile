@@ -1,3 +1,5 @@
+CFLAGS = -DWEBRTC_POSIX  -DWEBRTC_LINUX -DNOMINMAX 
+
 SOURCESGMM = \
 src/common_audio/signal_processing/complex_bit_reverse.c \
 src/common_audio/signal_processing/complex_fft.c \
@@ -59,6 +61,7 @@ src/rtc_base/system/file_wrapper.cc \
 src/rtc_base/strings/string_builder.cc \
 src/common_audio/wav_header.cc \
 src/common_audio/audio_util.cc \
+src/modules/audio_processing/agc2/cpu_features.cc \
 src/modules/audio_processing/agc2/rnn_vad/features_extraction.cc \
 src/modules/audio_processing/agc2/rnn_vad/rnn.cc \
 src/modules/audio_processing/agc2/biquad_filter.cc \
@@ -118,7 +121,7 @@ third_party/pffft/src/fftpack.h
 
 
 webrtcvadgmm.so:
-	$(CXX) $(SOURCESGMM) -DWEBRTC_POSIX -Isrc -Iabseil-cpp -shared -fPIC -o $@
+	$(CXX) $(SOURCESGMM) $(CFLAGS) -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
 
 webrtcvadrnn.so:
-	$(CXX) $(SOURCESRNN) webrtcvadrnn.so -DWEBRTC_POSIX  -DWEBRTC_LINUX -DNOMINMAX  -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
+	$(CXX) webrtcvadrnn.cc $(SOURCESRNN) $(CFLAGS) -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
