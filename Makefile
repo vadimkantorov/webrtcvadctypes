@@ -25,28 +25,6 @@ src/common_audio/vad/vad_sp.c \
 src/common_audio/vad/webrtc_vad.c \
 src/rtc_base/checks.cc
 
-INCLUDESGMM = \
-src/common_audio/signal_processing/complex_fft_tables.h \
-src/common_audio/signal_processing/dot_product_with_scale.h \
-src/common_audio/signal_processing/include/real_fft.h \
-src/common_audio/signal_processing/include/signal_processing_library.h \
-src/common_audio/signal_processing/include/spl_inl.h \
-src/common_audio/signal_processing/resample_by_2_internal.h \
-src/common_audio/third_party/spl_sqrt_floor/spl_sqrt_floor.h \
-src/common_audio/vad/include/webrtc_vad.h \
-src/common_audio/vad/vad_core.h \
-src/common_audio/vad/vad_filterbank.h \
-src/common_audio/vad/vad_gmm.h \
-src/common_audio/vad/vad_sp.h \
-src/rtc_base/checks.h \
-src/rtc_base/compile_assert_c.h \
-src/rtc_base/numerics/safe_compare.h \
-src/rtc_base/sanitizer.h \
-src/rtc_base/system/arch.h \
-src/rtc_base/system/inline.h \
-src/rtc_base/type_traits.h \
-src/system_wrappers/include/cpu_features_wrapper.h
-
 SOURCESRNN = \
 src/common_audio/resampler/push_sinc_resampler.cc \
 src/common_audio/resampler/sinc_resampler.cc \
@@ -76,6 +54,28 @@ src/modules/audio_processing/utility/pffft_wrapper.cc \
 third_party/rnnoise/src/rnn_vad_weights.cc \
 third_party/pffft/src/pffft.c \
 third_party/pffft/src/fftpack.c
+
+INCLUDESGMM = \
+src/common_audio/signal_processing/complex_fft_tables.h \
+src/common_audio/signal_processing/dot_product_with_scale.h \
+src/common_audio/signal_processing/include/real_fft.h \
+src/common_audio/signal_processing/include/signal_processing_library.h \
+src/common_audio/signal_processing/include/spl_inl.h \
+src/common_audio/signal_processing/resample_by_2_internal.h \
+src/common_audio/third_party/spl_sqrt_floor/spl_sqrt_floor.h \
+src/common_audio/vad/include/webrtc_vad.h \
+src/common_audio/vad/vad_core.h \
+src/common_audio/vad/vad_filterbank.h \
+src/common_audio/vad/vad_gmm.h \
+src/common_audio/vad/vad_sp.h \
+src/rtc_base/checks.h \
+src/rtc_base/compile_assert_c.h \
+src/rtc_base/numerics/safe_compare.h \
+src/rtc_base/sanitizer.h \
+src/rtc_base/system/arch.h \
+src/rtc_base/system/inline.h \
+src/rtc_base/type_traits.h \
+src/system_wrappers/include/cpu_features_wrapper.h
 
 INCLUDESRNN = \
 src/common_audio/resampler/push_sinc_resampler.h \
@@ -118,7 +118,6 @@ third_party/rnnoise/src/rnn_activations.h \
 third_party/rnnoise/src/rnn_vad_weights.h \
 third_party/pffft/src/pffft.h \
 third_party/pffft/src/fftpack.h
-
 
 webrtcvadgmm.so:
 	$(CXX) $(SOURCESGMM) $(CFLAGS) -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
