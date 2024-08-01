@@ -77,10 +77,10 @@ class Vad(ctypes.c_void_p):
         #                      int fs,
         #                      const int16_t* audio_frame,
         #                      size_t frame_length);
-        lib.WebRtcVad_Process.argtypes = [Vad, ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t] #[ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t]
-        # marshalling of bytes object to ctypes.POINTER(ctypes.c_int16) does not work automatically, but to ctypes.c_void_p works:
+        lib.WebRtcVad_Process.argtypes = [Vad, ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t]
+        #lib.WebRtcVad_Process.argtypes = [Vad, ctypes.c_int, ctypes.POINTER(ctypes.c_int16), ctypes.c_size_t]
+        # marshalling of bytes object to ctypes.POINTER(ctypes.c_int16) does not work automatically (need an explicit ctypes.cast, see below), but to ctypes.c_void_p works:
         # https://stackoverflow.com/questions/72624136/python-bytes-to-ctypes-void-pointer
-        # maybe use (ctypes.c_int16 * len(buf)).from_buffer(bytearray(buf)) to call WebRtcVad_Process
         lib.WebRtcVad_Process.restype = ctypes.c_int
         
         ## Checks for valid combinations of `rate` and `frame_length`. We support 10,
@@ -112,6 +112,7 @@ class Vad(ctypes.c_void_p):
         assert sample_rate in [8000, 16000, 32000, 48000]
         length = length or (len(buf) // 2)
         assert length * 2 <= len(buf), f'buffer has {len(buf) // 2} frames, but length argument was {length}'
+        #buf = ctypes.cast(buf, ctypes.POINTER(ctypes.c_int16))
         return 1 == Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
 
     def __new__(cls, mode=None, lib_path = None):
@@ -132,5 +133,4 @@ class Vad(ctypes.c_void_p):
         Vad._webrtcvad.WebRtcVad_Free(self)
         self.value = None
 
-    
 valid_rate_and_frame_length = Vad.valid_rate_and_frame_length
