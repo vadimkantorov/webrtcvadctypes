@@ -1,4 +1,8 @@
-# webrtcvadctypes
+Variant of https://github.com/wiseman/py-webrtcvad but based on pure ctypes wrapper of https://webrtc.googlesource.com/src/+/refs/heads/main/modules/audio_processing/vad/, so might be slightly slower but does not require compiling and installing a Python module (instead a providing an absolute path to a native `.so` shared library is sufficient).
+
+Also includes a similar-interfaced variant of https://webrtc.googlesource.com/src/+/refs/heads/main/modules/audio_processing/agc2/rnn_vad/ but it is not tested.
+
+Not production ready, for working with long audios you will want to add a function that performs the frame loop in C++ and binds that.
 
 ```shell
 git clone https://github.com/vadimkantorov/webrtcvadctypes --recursive
