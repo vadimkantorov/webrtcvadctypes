@@ -1,5 +1,7 @@
 import unittest
 import wave
+#from memory_profiler import memory_usage
+
 import webrtcvadctypes
 #import os; webrtcvadctypes.Vad.lib_path = os.path.abspath('webrtcvadctypesrnn.so') # does not pass tests yet
 
@@ -79,6 +81,28 @@ class WebRtcVadTests(unittest.TestCase):
                 voiced = vad.is_speech(chunk, 8000)
                 result += '1' if voiced else '0'
             self.assertEqual(expecteds[mode], result)
+
+    #def test_leak(self):
+    #    sound, fs = self._load_wave('leak-test.wav')
+    #    frame_ms = 0.010
+    #    frame_len = int(round(fs * frame_ms))
+    #    n = int(len(sound) / (2 * frame_len))
+    #    nrepeats = 1000
+    #    vad = webrtcvad.Vad(3)
+    #    used_memory_before = memory_usage(-1)[0]
+    #    for counter in range(nrepeats):
+    #        find_voice = False
+    #        for frame_ind in range(n):
+    #            slice_start = (frame_ind * 2 * frame_len)
+    #            slice_end = ((frame_ind + 1) * 2 * frame_len)
+    #            if vad.is_speech(sound[slice_start:slice_end], fs):
+    #                find_voice = True
+    #        self.assertTrue(find_voice)
+    #    used_memory_after = memory_usage(-1)[0]
+    #    self.assertGreaterEqual(
+    #        used_memory_before / 5.0,
+    #        used_memory_after - used_memory_before)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
