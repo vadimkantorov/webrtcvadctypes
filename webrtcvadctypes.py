@@ -9,6 +9,10 @@ import ctypes
 # src/common_audio/vad/webrtc_vad.c
 # src/common_audio/vad/vad.cc
 
+class c_zeroistrue(ctypes.c_int):
+    def __bool__(self):
+        return self.value == 0
+
 class Vad(ctypes.c_void_p):
     _webrtcvad = None
     
@@ -85,7 +89,7 @@ class Vad(ctypes.c_void_p):
         ## returns            : 0 - (valid combination), -1 - (invalid combination)
         #int WebRtcVad_ValidRateAndFrameLength(int rate, size_t frame_length);
         lib.WebRtcVad_ValidRateAndFrameLength.argtypes = [ctypes.c_int, ctypes.c_size_t]
-        lib.WebRtcVad_ValidRateAndFrameLength.restype = ctypes.c_int
+        lib.WebRtcVad_ValidRateAndFrameLength.restype = c_zeroistrue #ctypes.c_int
         return lib
 
     @staticmethod
@@ -94,8 +98,8 @@ class Vad(ctypes.c_void_p):
 
     def __init__(self, mode=None):
         # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
-        if self._webrtcvad is None:
-            self._webrtcvad = self.ffi()
+        if Vad._webrtcvad is None:
+            Vad._webrtcvad = self.ffi()
 
         self.value = self._webrtcvad.WebRtcVad_Create()
         assert 0 == Vad._webrtcvad.WebRtcVad_Init(self)
@@ -144,8 +148,8 @@ class VadRnn(ctypes.c_void_p):
 
     def __init__(self, mode=None):
         # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
-        if self._webrtcvad is None:
-            self._webrtcvad = self.ffi()
+        if VadRnn._webrtcvad is None:
+            VadRnn._webrtcvad = self.ffi()
 
         self.value = self._webrtcvad.WebRtcVadRnn_Create()
         assert 0 == VadRnn._webrtcvad.WebRtcVadRnn_Init(self)
@@ -157,7 +161,7 @@ class VadRnn(ctypes.c_void_p):
         self.value = None
     
     def set_mode(self, mode):
-        assert mode in [None, 0, 1, 2]
+        assert mode in [None, 0, 1, 2, 3]
         if mode is not None:
             assert 0 == VadRnn._webrtcvad.WebRtcVadRnn_set_mode(self, mode)
 
@@ -168,6 +172,7 @@ class VadRnn(ctypes.c_void_p):
             raise IndexError('buffer has {} frames, but length argument was {}'.format(int(len(buf) / 2.0), length))
         return VadRnn._webrtcvad.WebRtcVadRnn_Process(self, sample_rate, buf, length)
 
+valid_rate_and_frame_length = Vad.valid_rate_and_frame_length
 
 if __name__ == '__main__':
     vad = Vad()
