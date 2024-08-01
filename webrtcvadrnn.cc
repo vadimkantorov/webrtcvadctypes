@@ -26,6 +26,7 @@ static const size_t kRatesSize = sizeof(kValidRates) / sizeof(*kValidRates);
 struct VadRnnInstT
 {
     int init_flag;
+    float threshold;
     webrtc::rnn_vad::FeaturesExtractor features_extractor;
     webrtc::rnn_vad::RnnVad rnn_vad;
     std::array<float, webrtc::rnn_vad::kFrameSize10ms24kHz> samples_10ms_24kHz;
@@ -37,6 +38,7 @@ struct VadRnnInstT
                            rnn_vad(webrtc::GetAvailableCpuFeatures()), 
                 features_extractor(webrtc::GetAvailableCpuFeatures()),
                 init_flag(0),
+                threshold(0.5),
                 samples8khz_10ms ( 8000 / 100), resampler8khz ( 8000 / 100, webrtc::rnn_vad::kFrameSize10ms24kHz), 
                 samples16khz_10ms(16000 / 100), resampler16khz(16000 / 100, webrtc::rnn_vad::kFrameSize10ms24kHz), 
                 samples32khz_10ms(32000 / 100), resampler32khz(32000 / 100, webrtc::rnn_vad::kFrameSize10ms24kHz), 
@@ -84,6 +86,8 @@ extern "C" int WebRtcVadRnn_set_mode(VadRnnInst* handle, int mode) {
         return -1;
     }
 
+    self->threshold = mode == 0 ? 0.1 : mode == 1 ? 0.25 : mode == 2 ? 0.5 : 0.75;
+
     return 0;
 }
 
@@ -103,7 +107,7 @@ extern "C" int WebRtcVadRnn_ValidRateAndFrameLength(int rate, size_t frame_lengt
   return -1;
 }
 
-extern "C" float WebRtcVadRnn_Process(VadRnnInst* handle, int fs, const int16_t* audio_frame, size_t frame_length)
+extern "C" int WebRtcVadRnn_Process(VadRnnInst* handle, int fs, const int16_t* audio_frame, size_t frame_length)
 {
     int vad = -1;
     VadRnnInstT* self = (VadRnnInstT*) handle;
@@ -130,7 +134,7 @@ extern "C" float WebRtcVadRnn_Process(VadRnnInst* handle, int fs, const int16_t*
 
     resampler.Resample(samples_10ms.data(), samples_10ms.size(), self->samples_10ms_24kHz.data(), self->samples_10ms_24kHz.size());
     bool is_silence = self->features_extractor.CheckSilenceComputeFeatures(self->samples_10ms_24kHz, self->feature_vector);
-    return self->rnn_vad.ComputeVadProbability(self->feature_vector, is_silence);
+    return self->rnn_vad.ComputeVadProbability(self->feature_vector, is_silence) > self->threshold ? 1 : 0;
 }
 
 //}

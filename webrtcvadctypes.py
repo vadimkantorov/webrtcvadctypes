@@ -9,10 +9,6 @@ import ctypes
 # src/common_audio/vad/webrtc_vad.c
 # src/common_audio/vad/vad.cc
 
-class c_zeroistrue(ctypes.c_int):
-    def __bool__(self):
-        return self.value == 0
-
 class Vad(ctypes.c_void_p):
     _webrtcvad = None
     
@@ -89,12 +85,12 @@ class Vad(ctypes.c_void_p):
         ## returns            : 0 - (valid combination), -1 - (invalid combination)
         #int WebRtcVad_ValidRateAndFrameLength(int rate, size_t frame_length);
         lib.WebRtcVad_ValidRateAndFrameLength.argtypes = [ctypes.c_int, ctypes.c_size_t]
-        lib.WebRtcVad_ValidRateAndFrameLength.restype = c_zeroistrue #ctypes.c_int
+        lib.WebRtcVad_ValidRateAndFrameLength.restype = ctypes.c_int
         return lib
 
     @staticmethod
     def valid_rate_and_frame_length(rate, frame_length):
-        return Vad._webrtcvad.WebRtcVad_ValidRateAndFrameLength(rate, frame_length)
+        return 0 == Vad._webrtcvad.WebRtcVad_ValidRateAndFrameLength(rate, frame_length)
 
     def __init__(self, mode=None):
         # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
@@ -120,7 +116,7 @@ class Vad(ctypes.c_void_p):
         length = length or int(len(buf) / 2)
         if length * 2 > len(buf):
             raise IndexError('buffer has {} frames, but length argument was {}'.format(int(len(buf) / 2.0), length))
-        return Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
+        return 1 == Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
 
 class VadRnn(ctypes.c_void_p):
     _webrtcvad = None
@@ -137,14 +133,14 @@ class VadRnn(ctypes.c_void_p):
         lib.WebRtcVadRnn_set_mode.argtypes = [ctypes.c_void_p, ctypes.c_int]
         lib.WebRtcVadRnn_set_mode.restype = ctypes.c_int
         lib.WebRtcVadRnn_Process.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int16) , ctypes.c_size_t]
-        lib.WebRtcVadRnn_Process.restype = ctypes.c_float #ctypes.c_int
+        lib.WebRtcVadRnn_Process.restype = ctypes.c_int
         lib.WebRtcVadRnn_ValidRateAndFrameLength.argtypes = [ctypes.c_int, ctypes.c_size_t]
         lib.WebRtcVadRnn_ValidRateAndFrameLength.restype = ctypes.c_int
         return lib
 
     @staticmethod
     def valid_rate_and_frame_length(rate, frame_length):
-        return VadRnn._webrtcvad.WebRtcVadRnn_ValidRateAndFrameLength(rate, frame_length)
+        return 0 == VadRnn._webrtcvad.WebRtcVadRnn_ValidRateAndFrameLength(rate, frame_length)
 
     def __init__(self, mode=None):
         # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
@@ -170,9 +166,7 @@ class VadRnn(ctypes.c_void_p):
         length = length or int(len(buf) / 2)
         if length * 2 > len(buf):
             raise IndexError('buffer has {} frames, but length argument was {}'.format(int(len(buf) / 2.0), length))
-        return VadRnn._webrtcvad.WebRtcVadRnn_Process(self, sample_rate, buf, length)
-
-valid_rate_and_frame_length = Vad.valid_rate_and_frame_length
+        return 1 == VadRnn._webrtcvad.WebRtcVadRnn_Process(self, sample_rate, buf, length)
 
 if __name__ == '__main__':
     vad = Vad()
