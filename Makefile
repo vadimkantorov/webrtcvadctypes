@@ -1,6 +1,6 @@
 CFLAGS = -DWEBRTC_POSIX  -DWEBRTC_LINUX -DNOMINMAX 
 CPATH = -Isrc -Iabseil-cpp -I.
-LDFLAGS = -shared -fPIC
+LDFLAGS = -march=native -shared -fPIC
 
 SOURCESGMM = \
 src/common_audio/signal_processing/complex_bit_reverse.c \
@@ -30,11 +30,16 @@ src/rtc_base/checks.cc
 SOURCESRNN = webrtcvadrnn.cc \
 src/common_audio/resampler/push_sinc_resampler.cc \
 src/common_audio/resampler/sinc_resampler.cc \
+src/common_audio/resampler/sinc_resampler_sse.cc \
+src/common_audio/resampler/sinc_resampler_avx2.cc \
 src/common_audio/audio_util.cc \
 src/modules/audio_processing/agc2/cpu_features.cc \
 src/modules/audio_processing/agc2/rnn_vad/features_extraction.cc \
 src/modules/audio_processing/agc2/rnn_vad/rnn.cc \
 src/modules/audio_processing/agc2/biquad_filter.cc \
+src/modules/audio_processing/agc2/rnn_vad/vector_math_avx2.cc \
+src/modules/audio_processing/agc2/rnn_vad/rnn_gru.cc \
+src/modules/audio_processing/agc2/rnn_vad/rnn_fc.cc \
 src/modules/audio_processing/agc2/rnn_vad/pitch_search.cc \
 src/modules/audio_processing/agc2/rnn_vad/lp_residual.cc \
 src/modules/audio_processing/agc2/rnn_vad/auto_correlation.cc \
@@ -42,86 +47,19 @@ src/modules/audio_processing/agc2/rnn_vad/pitch_search_internal.cc \
 src/modules/audio_processing/agc2/rnn_vad/spectral_features.cc \
 src/modules/audio_processing/agc2/rnn_vad/spectral_features_internal.cc \
 src/modules/audio_processing/utility/pffft_wrapper.cc \
+src/system_wrappers/source/cpu_features.cc \
+src/rtc_base/memory/aligned_malloc.cc \
+src/rtc_base/logging.cc \
+src/rtc_base/string_encode.cc \
+src/rtc_base/strings/string_builder.cc \
+src/rtc_base/string_utils.cc \
+src/rtc_base/time_utils.cc \
+src/rtc_base/system_time.cc \
+src/rtc_base/platform_thread_types.cc \
+src/rtc_base/checks.cc \
 third_party/rnnoise/src/rnn_vad_weights.cc \
 third_party/pffft/src/pffft.c \
 third_party/pffft/src/fftpack.c
-
-#src/common_audio/wav_file.cc \
-#src/common_audio/wav_header.cc \
-
-#src/rtc_base/memory/aligned_malloc.cc \
-#src/rtc_base/checks.cc \
-#src/rtc_base/logging.cc \
-#src/rtc_base/string_utils.cc \
-#src/rtc_base/time_utils.cc \
-#src/rtc_base/string_encode.cc \
-#src/rtc_base/platform_thread_types.cc \
-#src/rtc_base/system/file_wrapper.cc \
-#src/rtc_base/strings/string_builder.cc \
-
-INCLUDESGMM = \
-src/common_audio/signal_processing/complex_fft_tables.h \
-src/common_audio/signal_processing/dot_product_with_scale.h \
-src/common_audio/signal_processing/include/real_fft.h \
-src/common_audio/signal_processing/include/signal_processing_library.h \
-src/common_audio/signal_processing/include/spl_inl.h \
-src/common_audio/signal_processing/resample_by_2_internal.h \
-src/common_audio/third_party/spl_sqrt_floor/spl_sqrt_floor.h \
-src/common_audio/vad/include/webrtc_vad.h \
-src/common_audio/vad/vad_core.h \
-src/common_audio/vad/vad_filterbank.h \
-src/common_audio/vad/vad_gmm.h \
-src/common_audio/vad/vad_sp.h \
-src/rtc_base/checks.h \
-src/rtc_base/compile_assert_c.h \
-src/rtc_base/numerics/safe_compare.h \
-src/rtc_base/sanitizer.h \
-src/rtc_base/system/arch.h \
-src/rtc_base/system/inline.h \
-src/rtc_base/type_traits.h \
-src/system_wrappers/include/cpu_features_wrapper.h
-
-INCLUDESRNN = \
-src/common_audio/resampler/push_sinc_resampler.h \
-src/common_audio/resampler/sinc_resampler.h \
-src/common_audio/wav_file.h \
-src/rtc_base/checks.h \
-src/rtc_base/logging.h \
-src/rtc_base/string_utils.h \
-src/rtc_base/time_utils.h \
-src/rtc_base/atomic_ops.h \
-src/rtc_base/sanitizer.h \
-src/rtc_base/string_encode.h \
-src/rtc_base/thread_annotations.h \
-src/rtc_base/platform_thread_types.h \
-src/rtc_base/numerics/safe_minmax.h \
-src/rtc_base/system/file_wrapper.h \
-src/rtc_base/system/unused.h \
-src/rtc_base/numerics/safe_conversions.h \
-src/rtc_base/numerics/safe_conversions_impl.h \
-src/rtc_base/strings/string_builder.h \
-src/common_audio/wav_header.h \
-src/common_audio/include/audio_util.h \
-src/modules/audio_processing/agc2/rnn_vad/features_extraction.h \
-src/modules/audio_processing/agc2/rnn_vad/common.h \
-src/modules/audio_processing/agc2/rnn_vad/rnn.h \
-src/modules/audio_processing/agc2/biquad_filter.h \
-src/rtc_base/memory/aligned_malloc.h \
-src/modules/audio_processing/agc2/rnn_vad/pitch_info.h \
-src/modules/audio_processing/agc2/rnn_vad/pitch_search.h \
-src/modules/audio_processing/agc2/rnn_vad/sequence_buffer.h \
-src/modules/audio_processing/agc2/rnn_vad/lp_residual.h \
-src/modules/audio_processing/agc2/rnn_vad/auto_correlation.h \
-src/modules/audio_processing/agc2/rnn_vad/pitch_search_internal.h \
-src/modules/audio_processing/agc2/rnn_vad/spectral_features.h \
-src/modules/audio_processing/agc2/rnn_vad/spectral_features_internal.h \
-src/modules/audio_processing/agc2/rnn_vad/ring_buffer.h \
-src/modules/audio_processing/agc2/rnn_vad/symmetric_matrix_buffer.h \
-src/modules/audio_processing/utility/pffft_wrapper.h \
-third_party/rnnoise/src/rnn_activations.h \
-third_party/rnnoise/src/rnn_vad_weights.h \
-third_party/pffft/src/pffft.h \
-third_party/pffft/src/fftpack.h
 
 webrtcvadctypesgmm.so:
 	$(CXX) $(SOURCESGMM) $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
