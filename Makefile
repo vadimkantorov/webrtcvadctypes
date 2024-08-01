@@ -1,4 +1,4 @@
-CFLAGS = -DWEBRTC_POSIX  -DWEBRTC_LINUX -DNOMINMAX 
+CFLAGS = -DWEBRTC_POSIX  -DWEBRTC_LINUX
 CPATH = -Isrc -Iabseil-cpp -I.
 LDFLAGS = -march=native -shared -fPIC
 

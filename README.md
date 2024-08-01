@@ -9,6 +9,10 @@ make webrtcvadctypesrnn.so
 # git submodule add https://webrtc.googlesource.com/src/
 ```
 
+# Notes
+- `webrtcvadctypes.py` interface and `test_webrtcvadctypes.py` are taken from https://github.com/wiseman/py-webrtcvad
+- `third_party` contents is taken from https://chromium.googlesource.com/chromium/src/third_party/
+
 # References
 - https://github.com/wiseman/py-webrtcvad
 - https://github.com/wiseman/py-webrtcvad/issues/69

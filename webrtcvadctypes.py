@@ -1,17 +1,13 @@
 import os
 import ctypes
 
-# TODO: replicate https://github.com/wiseman/py-webrtcvad/blob/master/cbits/pywebrtcvad.c
-# https://webrtc.googlesource.com/src/+/refs/heads/main/modules/audio_processing/vad/standalone_vad.cc
 # https://github.com/wiseman/py-webrtcvad/blob/master/example.py
-# https://github.com/vadimkantorov/readaudio/blob/master/decode_audio.py
-
 # src/common_audio/vad/webrtc_vad.c
 # src/common_audio/vad/vad.cc
-
-LIB_PATH = os.path.abspath('webrtcvadctypesgmm.so') 
+# src/modules/audio_processing/vad/standalone_vad.cc
 
 class Vad(ctypes.c_void_p):
+    lib_path = os.path.abspath('webrtcvadctypesgmm.so')
     _webrtcvad = None
     
     @staticmethod
@@ -101,7 +97,7 @@ class Vad(ctypes.c_void_p):
     def __init__(self, mode=None, lib_path = None):
         # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
         if Vad._webrtcvad is None:
-            Vad.initialize(lib_path or LIB_PATH)
+            Vad.initialize(lib_path or Vad.lib_path)
 
         self.value = self._webrtcvad.WebRtcVad_Create()
         assert 0 == Vad._webrtcvad.WebRtcVad_Init(self)
@@ -119,13 +115,8 @@ class Vad(ctypes.c_void_p):
 
     def is_speech(self, buf, sample_rate, length=None):
         assert sample_rate in [8000, 16000, 32000, 48000]
-        length = length or int(len(buf) / 2)
-        if length * 2 > len(buf):
-            raise IndexError('buffer has {} frames, but length argument was {}'.format(int(len(buf) / 2.0), length))
+        length = length or (len(buf) // 2)
+        assert length * 2 <= len(buf), f'buffer has {len(buf) // 2} frames, but length argument was {length}'
         return 1 == Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
 
 valid_rate_and_frame_length = Vad.valid_rate_and_frame_length
-
-if __name__ == '__main__':
-    vad = Vad()
-    print(vad)
