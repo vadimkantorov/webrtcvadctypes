@@ -23,7 +23,7 @@ static const int kInitCheck = 42;
 static const int kValidRates[] = { 8000, 16000, 32000, 48000 };
 static const size_t kRatesSize = sizeof(kValidRates) / sizeof(*kValidRates);
 
-struct VadRnnInstT
+struct VadInstT
 {
     int init_flag;
     float threshold;
@@ -34,7 +34,7 @@ struct VadRnnInstT
     std::vector<float> samples8khz_10ms, samples16khz_10ms, samples32khz_10ms, samples48khz_10ms;
     webrtc::PushSincResampler resampler8khz, resampler16khz, resampler32khz, resampler48khz;
 
-    VadRnnInstT() :
+    VadInstT() :
                            rnn_vad(webrtc::GetAvailableCpuFeatures()), 
                 features_extractor(webrtc::GetAvailableCpuFeatures()),
                 init_flag(0),
@@ -46,29 +46,29 @@ struct VadRnnInstT
     { }
 };
 
-typedef struct VadRnnInstT VadRnnInst;
+typedef struct VadInstT VadInst;
 
 //typedef struct WebRtcVadInst VadInst;
 
 //extern "C"  {
 
-extern "C" VadRnnInst* WebRtcVadRnn_Create()
+extern "C" VadInst* WebRtcVad_Create()
 {
-    VadRnnInstT* self = new VadRnnInstT();
+    VadInstT* self = new VadInstT();
     self->init_flag = 0;
-    VadRnnInst* handle = (VadRnnInst*)self;
+    VadInst* handle = (VadInst*)self;
     return handle;
 }
 
-extern "C" void WebRtcVadRnn_Free(VadRnnInst* handle)
+extern "C" void WebRtcVad_Free(VadInst* handle)
 {
-    VadRnnInstT* self = (VadRnnInst*)handle;
+    VadInstT* self = (VadInst*)handle;
     delete self;
 }
 
-extern "C" int WebRtcVadRnn_Init(VadRnnInst* handle)
+extern "C" int WebRtcVad_Init(VadInst* handle)
 {
-    VadRnnInstT* self = (VadRnnInst*)handle;
+    VadInstT* self = (VadInst*)handle;
     if (self == NULL) {
         return -1;
     }
@@ -76,8 +76,8 @@ extern "C" int WebRtcVadRnn_Init(VadRnnInst* handle)
     return 0;
 }
 
-extern "C" int WebRtcVadRnn_set_mode(VadRnnInst* handle, int mode) {
-    VadRnnInstT* self = (VadRnnInstT*) handle;
+extern "C" int WebRtcVad_set_mode(VadInst* handle, int mode) {
+    VadInstT* self = (VadInstT*) handle;
 
     if (handle == NULL) {
         return -1;
@@ -91,7 +91,7 @@ extern "C" int WebRtcVadRnn_set_mode(VadRnnInst* handle, int mode) {
     return 0;
 }
 
-extern "C" int WebRtcVadRnn_ValidRateAndFrameLength(int rate, size_t frame_length)
+extern "C" int WebRtcVad_ValidRateAndFrameLength(int rate, size_t frame_length)
 {
   const int valid_length_ms = 10;
   // We only allow 10ms frames. Loop through valid frame rates and see if we have a matching pair.
@@ -107,10 +107,10 @@ extern "C" int WebRtcVadRnn_ValidRateAndFrameLength(int rate, size_t frame_lengt
   return -1;
 }
 
-extern "C" int WebRtcVadRnn_Process(VadRnnInst* handle, int fs, const int16_t* audio_frame, size_t frame_length)
+extern "C" int WebRtcVad_Process(VadInst* handle, int fs, const int16_t* audio_frame, size_t frame_length)
 {
     int vad = -1;
-    VadRnnInstT* self = (VadRnnInstT*) handle;
+    VadInstT* self = (VadInstT*) handle;
     
     if (handle == NULL) {
         return -1;
@@ -122,7 +122,7 @@ extern "C" int WebRtcVadRnn_Process(VadRnnInst* handle, int fs, const int16_t* a
     if (audio_frame == NULL) {
         return -1;
     }
-    if (WebRtcVadRnn_ValidRateAndFrameLength(fs, frame_length) != 0) {
+    if (WebRtcVad_ValidRateAndFrameLength(fs, frame_length) != 0) {
         return -1;
     }
     //if (read_samples < frame_size_10ms) break; 

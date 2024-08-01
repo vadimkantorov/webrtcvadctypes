@@ -123,8 +123,8 @@ third_party/rnnoise/src/rnn_vad_weights.h \
 third_party/pffft/src/pffft.h \
 third_party/pffft/src/fftpack.h
 
-webrtcvadgmm.so:
+webrtcvadctypesgmm.so:
 	$(CXX) $(SOURCESGMM) $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
 
-webrtcvadrnn.so:
+webrtcvadctypesrnn.so:
 	$(CXX) $(SOURCESRNN) $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
