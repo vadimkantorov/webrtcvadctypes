@@ -29,14 +29,6 @@ SOURCESRNN = \
 src/common_audio/resampler/push_sinc_resampler.cc \
 src/common_audio/resampler/sinc_resampler.cc \
 src/common_audio/wav_file.cc \
-src/rtc_base/checks.cc \
-src/rtc_base/logging.cc \
-src/rtc_base/string_utils.cc \
-src/rtc_base/time_utils.cc \
-src/rtc_base/string_encode.cc \
-src/rtc_base/platform_thread_types.cc \
-src/rtc_base/system/file_wrapper.cc \
-src/rtc_base/strings/string_builder.cc \
 src/common_audio/wav_header.cc \
 src/common_audio/audio_util.cc \
 src/modules/audio_processing/agc2/cpu_features.cc \
@@ -54,6 +46,15 @@ src/modules/audio_processing/utility/pffft_wrapper.cc \
 third_party/rnnoise/src/rnn_vad_weights.cc \
 third_party/pffft/src/pffft.c \
 third_party/pffft/src/fftpack.c
+
+#src/rtc_base/checks.cc \
+#src/rtc_base/logging.cc \
+#src/rtc_base/string_utils.cc \
+#src/rtc_base/time_utils.cc \
+#src/rtc_base/string_encode.cc \
+#src/rtc_base/platform_thread_types.cc \
+#src/rtc_base/system/file_wrapper.cc \
+#src/rtc_base/strings/string_builder.cc \
 
 INCLUDESGMM = \
 src/common_audio/signal_processing/complex_fft_tables.h \
