@@ -133,7 +133,7 @@ class VadRnn(ctypes.c_void_p):
         lib.WebRtcVadRnn_set_mode.argtypes = [ctypes.c_void_p, ctypes.c_int]
         lib.WebRtcVadRnn_set_mode.restype = ctypes.c_int
         lib.WebRtcVadRnn_Process.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int16) , ctypes.c_size_t]
-        lib.WebRtcVadRnn_Process.restype = ctypes.c_int
+        lib.WebRtcVadRnn_Process.restype = ctypes.c_float #ctypes.c_int
         lib.WebRtcVadRnn_ValidRateAndFrameLength.argtypes = [ctypes.c_int, ctypes.c_size_t]
         lib.WebRtcVadRnn_ValidRateAndFrameLength.restype = ctypes.c_int
         return lib

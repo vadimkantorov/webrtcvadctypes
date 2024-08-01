@@ -1,4 +1,6 @@
 CFLAGS = -DWEBRTC_POSIX  -DWEBRTC_LINUX -DNOMINMAX 
+CPATH = -Isrc -Iabseil-cpp -I.
+LDFLAGS = -shared -fPIC
 
 SOURCESGMM = \
 src/common_audio/signal_processing/complex_bit_reverse.c \
@@ -25,17 +27,14 @@ src/common_audio/vad/vad_sp.c \
 src/common_audio/vad/webrtc_vad.c \
 src/rtc_base/checks.cc
 
-SOURCESRNN = \
+SOURCESRNN = webrtcvadrnn.cc \
 src/common_audio/resampler/push_sinc_resampler.cc \
 src/common_audio/resampler/sinc_resampler.cc \
-src/common_audio/wav_file.cc \
-src/common_audio/wav_header.cc \
 src/common_audio/audio_util.cc \
 src/modules/audio_processing/agc2/cpu_features.cc \
 src/modules/audio_processing/agc2/rnn_vad/features_extraction.cc \
 src/modules/audio_processing/agc2/rnn_vad/rnn.cc \
 src/modules/audio_processing/agc2/biquad_filter.cc \
-src/rtc_base/memory/aligned_malloc.cc \
 src/modules/audio_processing/agc2/rnn_vad/pitch_search.cc \
 src/modules/audio_processing/agc2/rnn_vad/lp_residual.cc \
 src/modules/audio_processing/agc2/rnn_vad/auto_correlation.cc \
@@ -47,6 +46,10 @@ third_party/rnnoise/src/rnn_vad_weights.cc \
 third_party/pffft/src/pffft.c \
 third_party/pffft/src/fftpack.c
 
+#src/common_audio/wav_file.cc \
+#src/common_audio/wav_header.cc \
+
+#src/rtc_base/memory/aligned_malloc.cc \
 #src/rtc_base/checks.cc \
 #src/rtc_base/logging.cc \
 #src/rtc_base/string_utils.cc \
@@ -121,7 +124,7 @@ third_party/pffft/src/pffft.h \
 third_party/pffft/src/fftpack.h
 
 webrtcvadgmm.so:
-	$(CXX) $(SOURCESGMM) $(CFLAGS) -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
+	$(CXX) $(SOURCESGMM) $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
 
 webrtcvadrnn.so:
-	$(CXX) webrtcvadrnn.cc $(SOURCESRNN) $(CFLAGS) -Isrc -Iabseil-cpp -I. -shared -fPIC -o $@
+	$(CXX) $(SOURCESRNN) $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
