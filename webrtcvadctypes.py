@@ -11,6 +11,10 @@ class Vad(ctypes.c_void_p):
     _webrtcvad = None
     
     @staticmethod
+    def initialize(lib_path):
+        Vad._webrtcvad = Vad.ffi(lib_path)
+
+    @staticmethod
     def ffi(lib_path):
         # using Vad in place of ctypes.c_void_p in bindings for some reason leads to memory corruption during test
         # https://stackoverflow.com/questions/78808780/deriving-from-ctypes-c-void-p-to-represent-a-custom-handler
@@ -21,14 +25,14 @@ class Vad(ctypes.c_void_p):
         ## Creates an instance to the VAD structure.
         #VadInst* WebRtcVad_Create(void);
         lib.WebRtcVad_Create.argtypes = []
-        lib.WebRtcVad_Create.restype = ctypes.c_void_p
+        lib.WebRtcVad_Create.restype = Vad #ctypes.c_void_p
         
         
         ## Frees the dynamic memory of a specified VAD instance.
         ##
         ## - handle [i] : Pointer to VAD instance that should be freed.
         #void WebRtcVad_Free(VadInst* handle);
-        lib.WebRtcVad_Free.argtypes = [ctypes.c_void_p]
+        lib.WebRtcVad_Free.argtypes = [Vad]
         lib.WebRtcVad_Free.restype = None
         
         ## Initializes a VAD instance.
@@ -38,7 +42,7 @@ class Vad(ctypes.c_void_p):
         ## returns        : 0 - (OK),
         ##                 -1 - (null pointer or Default mode could not be set).
         #int WebRtcVad_Init(VadInst* handle);
-        lib.WebRtcVad_Init.argtypes = [ctypes.c_void_p]
+        lib.WebRtcVad_Init.argtypes = [Vad]#[ctypes.c_void_p]
         lib.WebRtcVad_Init.restype = ctypes.c_int
         
         
@@ -54,7 +58,7 @@ class Vad(ctypes.c_void_p):
         ##                 -1 - (null pointer, mode could not be set or the VAD instance
         ##                       has not been initialized).
         #int WebRtcVad_set_mode(VadInst* handle, int mode);
-        lib.WebRtcVad_set_mode.argtypes = [ctypes.c_void_p, ctypes.c_int]
+        lib.WebRtcVad_set_mode.argtypes = [Vad, ctypes.c_int] #[ctypes.c_void_p, ctypes.c_int]
         lib.WebRtcVad_set_mode.restype = ctypes.c_int
         
         ## Calculates a VAD decision for the `audio_frame`. For valid sampling rates
@@ -73,7 +77,7 @@ class Vad(ctypes.c_void_p):
         #                      int fs,
         #                      const int16_t* audio_frame,
         #                      size_t frame_length);
-        lib.WebRtcVad_Process.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t]
+        lib.WebRtcVad_Process.argtypes = [Vad, ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t] #[ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t]
         # marshalling of bytes object to ctypes.POINTER(ctypes.c_int16) does not work automatically, but to ctypes.c_void_p works:
         # https://stackoverflow.com/questions/72624136/python-bytes-to-ctypes-void-pointer
         # maybe use (ctypes.c_int16 * len(buf)).from_buffer(bytearray(buf)) to call WebRtcVad_Process
@@ -90,33 +94,12 @@ class Vad(ctypes.c_void_p):
         lib.WebRtcVad_ValidRateAndFrameLength.argtypes = [ctypes.c_int, ctypes.c_size_t]
         lib.WebRtcVad_ValidRateAndFrameLength.restype = ctypes.c_int
         return lib
-
-    @staticmethod
-    def initialize(lib_path):
-        Vad._webrtcvad = Vad.ffi(lib_path)
-
+    
     @staticmethod
     def valid_rate_and_frame_length(rate, frame_length, lib_path = None):
         if Vad._webrtcvad is None:
             Vad.initialize(lib_path or Vad.lib_path)
         return 0 == Vad._webrtcvad.WebRtcVad_ValidRateAndFrameLength(rate, frame_length)
-
-    def __init__(self, mode=None, lib_path = None):
-        # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
-        if Vad._webrtcvad is None:
-            Vad.initialize(lib_path or Vad.lib_path)
-
-        assert Vad._webrtcvad is not None
-
-        self.value = Vad._webrtcvad.WebRtcVad_Create()
-        assert 0 == Vad._webrtcvad.WebRtcVad_Init(self)
-        if mode is not None:
-            self.set_mode(mode)
-
-    def __del__(self):
-        assert Vad._webrtcvad is not None
-        Vad._webrtcvad.WebRtcVad_Free(self)
-        self.value = None
     
     def set_mode(self, mode):
         assert Vad._webrtcvad is not None
@@ -131,4 +114,23 @@ class Vad(ctypes.c_void_p):
         assert length * 2 <= len(buf), f'buffer has {len(buf) // 2} frames, but length argument was {length}'
         return 1 == Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
 
+    def __new__(cls, mode=None, lib_path = None):
+        # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
+        if Vad._webrtcvad is None:
+            Vad.initialize(lib_path or Vad.lib_path)
+        assert Vad._webrtcvad is not None
+        return Vad._webrtcvad.WebRtcVad_Create()
+
+    def __init__(self, mode=None, lib_path = None):
+        assert Vad._webrtcvad is not None
+        assert 0 == Vad._webrtcvad.WebRtcVad_Init(self)
+        if mode is not None:
+            self.set_mode(mode)
+    
+    def __del__(self):
+        assert Vad._webrtcvad is not None
+        Vad._webrtcvad.WebRtcVad_Free(self)
+        self.value = None
+
+    
 valid_rate_and_frame_length = Vad.valid_rate_and_frame_length

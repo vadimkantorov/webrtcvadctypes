@@ -24,18 +24,18 @@ class WebRtcVadTests(unittest.TestCase):
             del fp
         return sound_data, sampling_frequency
 
-    #def test_constructor(self):
-    #    vad = webrtcvadctypes.Vad()
+    def test_constructor(self):
+        vad = webrtcvadctypes.Vad()
 
-    #def test_set_mode(self):
-    #    vad = webrtcvadctypes.Vad()
-    #    vad.set_mode(0)
-    #    vad.set_mode(1)
-    #    vad.set_mode(2)
-    #    vad.set_mode(3)
-    #    self.assertRaises(
-    #        AssertionError,#ValueError,
-    #        vad.set_mode, 4)
+    def test_set_mode(self):
+        vad = webrtcvadctypes.Vad()
+        vad.set_mode(0)
+        vad.set_mode(1)
+        vad.set_mode(2)
+        vad.set_mode(3)
+        self.assertRaises(
+            AssertionError,#ValueError,
+            vad.set_mode, 4)
 
     def test_valid_rate_and_frame_length(self):
         self.assertTrue(webrtcvadctypes.valid_rate_and_frame_length(8000, 160))
