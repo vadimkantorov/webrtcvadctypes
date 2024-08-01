@@ -107,7 +107,7 @@ class Vad(ctypes.c_void_p):
         self.value = None
     
     def set_mode(self, mode):
-        assert mode in [None, 0, 1, 2]
+        assert mode in [None, 0, 1, 2, 3]
         if mode is not None:
             assert 0 == Vad._webrtcvad.WebRtcVad_set_mode(self, mode)
 

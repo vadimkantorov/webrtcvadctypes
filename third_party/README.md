@@ -1,0 +1,2 @@
+- https://chromium.googlesource.com/chromium/src/third_party/+/refs/heads/main/pffft/
+- https://chromium.googlesource.com/chromium/src/third_party/+/refs/heads/main/rnnoise
