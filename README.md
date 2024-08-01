@@ -4,6 +4,7 @@
 git clone https://github.com/vadimkantorov/webrtcvadctypes --recursive
 make webrtcvadctypesgmm.so
 make webrtcvadctypesrnn.so
+python test_webrtcvadctypes.py
 
 # git submodule add --branch lts_2024_07_22 git@github.com:abseil/abseil-cpp.git
 # git submodule add https://webrtc.googlesource.com/src/
