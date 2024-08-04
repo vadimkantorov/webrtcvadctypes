@@ -1,10 +1,10 @@
 import os
 import ctypes
 
-# https://github.com/wiseman/py-webrtcvad/blob/master/example.py
 # src/common_audio/vad/webrtc_vad.c
 # src/common_audio/vad/vad.cc
 # src/modules/audio_processing/vad/standalone_vad.cc
+# src/modules/audio_processing/agc2/rnn_vad/rnn_vad_tool.cc
 
 class Vad(ctypes.c_void_p):
     lib_path = os.path.abspath('webrtcvadctypesgmm.so')
@@ -18,9 +18,9 @@ class Vad(ctypes.c_void_p):
     def ffi(lib_path):
         # using Vad in place of ctypes.c_void_p in bindings for some reason leads to memory corruption during test
         # https://stackoverflow.com/questions/78808780/deriving-from-ctypes-c-void-p-to-represent-a-custom-handler
-        lib = ctypes.CDLL(lib_path)
         
         # src/common_audio/vad/include/webrtc_vad.h
+        lib = ctypes.CDLL(lib_path)
 
         ## Creates an instance to the VAD structure.
         #VadInst* WebRtcVad_Create(void);

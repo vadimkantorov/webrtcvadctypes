@@ -28,3 +28,4 @@ python test_webrtcvadctypes.py
 - https://webrtc.googlesource.com/src/+/refs/heads/master/modules/audio_processing/agc2/rnn_vad/
 - https://chromium.googlesource.com/external/webrtc/+log/master/modules/audio_processing/agc2/rnn_vad
 - https://chromium.googlesource.com/external/webrtc/+log/main/modules/audio_processing/agc2/rnn_vad
+- https://github.com/wiseman/py-webrtcvad/blob/master/example.py
