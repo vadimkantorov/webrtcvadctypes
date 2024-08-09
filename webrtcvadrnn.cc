@@ -9,8 +9,8 @@
  */
 
 
-#include <array>
 #include <string>
+#include <array>
 #include <vector>
 
 #include "common_audio/include/audio_util.h"
@@ -47,10 +47,6 @@ struct VadInstT
 };
 
 typedef struct VadInstT VadInst;
-
-//typedef struct WebRtcVadInst VadInst;
-
-//extern "C"  {
 
 extern "C" VadInst* WebRtcVad_Create()
 {
