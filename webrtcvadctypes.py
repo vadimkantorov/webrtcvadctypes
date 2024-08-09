@@ -112,8 +112,7 @@ class Vad(ctypes.c_void_p):
         assert sample_rate in [8000, 16000, 32000, 48000]
         length = length or (len(buf) // 2)
         assert length * 2 <= len(buf), f'buffer has {len(buf) // 2} frames, but length argument was {length}'
-        buf = ctypes.cast(buf, ctypes.POINTER(ctypes.c_int16))
-        return 1 == Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, buf, length)
+        return 1 == Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, ctypes.cast(buf, ctypes.POINTER(ctypes.c_int16)), length)
 
     def __new__(cls, mode=None, lib_path = None):
         # https://stackoverflow.com/questions/17840144/why-does-setting-ctypes-dll-function-restype-c-void-p-return-long 
