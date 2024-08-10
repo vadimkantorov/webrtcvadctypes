@@ -1,6 +1,6 @@
-CFLAGS = -DWEBRTC_POSIX  -DWEBRTC_LINUX
+CFLAGS = -DWEBRTC_POSIX -DWEBRTC_LINUX
 CPATH = -Isrc -Iabseil-cpp -I.
-LDFLAGS = -march=native -shared -fPIC
+LDFLAGS = -shared -fPIC  -march=native 
 
 SOURCESGMM = \
 src/common_audio/signal_processing/complex_bit_reverse.c \
