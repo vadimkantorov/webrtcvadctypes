@@ -6,8 +6,8 @@ Not production ready, for working with long audios you will want to add a functi
 
 ```shell
 git clone https://github.com/vadimkantorov/webrtcvadctypes --recursive
-make webrtcvadctypesgmm.so
-make webrtcvadctypesrnn.so
+make libwebrtcvadctypesgmm.so
+make libwebrtcvadctypesrnn.so
 python test_webrtcvadctypes.py
 
 # git submodule add --branch lts_2024_07_22 git@github.com:abseil/abseil-cpp.git

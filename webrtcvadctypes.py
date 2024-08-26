@@ -7,7 +7,7 @@ import ctypes
 # src/modules/audio_processing/agc2/rnn_vad/rnn_vad_tool.cc
 
 class Vad(ctypes.c_void_p):
-    lib_path = os.path.abspath('webrtcvadctypesgmm.so')
+    lib_path = os.path.abspath('libwebrtcvadctypesgmm.so')
     _webrtcvad = None
     
     @staticmethod
