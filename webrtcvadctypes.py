@@ -6,6 +6,7 @@ import ctypes
 # src/modules/audio_processing/vad/standalone_vad.cc
 # src/modules/audio_processing/agc2/rnn_vad/rnn_vad_tool.cc
 
+# https://stackoverflow.com/questions/78808780/deriving-from-ctypes-c-void-p-to-represent-a-custom-handler
 class Vad(ctypes.c_void_p):
     lib_path = os.path.abspath('libwebrtcvadctypesgmm.so')
     _webrtcvad = None
@@ -16,11 +17,9 @@ class Vad(ctypes.c_void_p):
 
     @staticmethod
     def ffi(lib_path):
-        # using Vad in place of ctypes.c_void_p in bindings for some reason leads to memory corruption during test
-        # https://stackoverflow.com/questions/78808780/deriving-from-ctypes-c-void-p-to-represent-a-custom-handler
-        
         # src/common_audio/vad/include/webrtc_vad.h
         lib = ctypes.CDLL(lib_path)
+
 
         ## Creates an instance to the VAD structure.
         #VadInst* WebRtcVad_Create(void);
@@ -109,7 +108,7 @@ class Vad(ctypes.c_void_p):
 
     def is_speech(self, buf, sample_rate, length=None):
         assert Vad._webrtcvad is not None
-        assert sample_rate in [8000, 16000, 32000, 48000]
+        assert sample_rate in [8_000, 16_000, 32_000, 48_000]
         length = length or (len(buf) // 2)
         assert length * 2 <= len(buf), f'buffer has {len(buf) // 2} frames, but length argument was {length}'
         return 1 == Vad._webrtcvad.WebRtcVad_Process(self, sample_rate, ctypes.cast(buf, ctypes.POINTER(ctypes.c_int16)), length)
