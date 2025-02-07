@@ -61,8 +61,8 @@ third_party/rnnoise/src/rnn_vad_weights.cc \
 third_party/pffft/src/pffft.c \
 third_party/pffft/src/fftpack.c
 
-libwebrtcvadctypesgmm.so:
-	$(CXX) $(SOURCESGMM) $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
+libwebrtcvadctypesgmm.so: $(SOURCESGMM) 
+	$(CXX) $^ $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
 
-libwebrtcvadctypesrnn.so:
-	$(CXX) $(SOURCESRNN) $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
+libwebrtcvadctypesrnn.so: $(SOURCESRNN)
+	$(CXX) $^ $(CFLAGS) $(CPATH) $(LDFLAGS) -o $@
